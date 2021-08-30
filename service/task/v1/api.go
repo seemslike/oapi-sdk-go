@@ -10,71 +10,71 @@ import (
 )
 
 type Service struct {
-    conf           *config.Config
+	conf           *config.Config
 	Tasks   *TaskService
 	TaskCollaborators   *TaskCollaboratorService
 	TaskComments   *TaskCommentService
 	TaskFollowers   *TaskFollowerService
 	TaskReminders   *TaskReminderService
-	
+
 }
 
 func NewService(conf *config.Config) *Service {
-    s := &Service{
-        conf:     conf,
-    }
-    s.Tasks = newTaskService(s)
-    s.TaskCollaborators = newTaskCollaboratorService(s)
-    s.TaskComments = newTaskCommentService(s)
-    s.TaskFollowers = newTaskFollowerService(s)
-    s.TaskReminders = newTaskReminderService(s)
-    return s
+	s := &Service{
+		conf:     conf,
+	}
+	s.Tasks = newTaskService(s)
+	s.TaskCollaborators = newTaskCollaboratorService(s)
+	s.TaskComments = newTaskCommentService(s)
+	s.TaskFollowers = newTaskFollowerService(s)
+	s.TaskReminders = newTaskReminderService(s)
+	return s
 }
 
 type TaskService struct {
-    service     *Service
+	service     *Service
 }
 
 func newTaskService(service *Service) *TaskService {
-    return &TaskService{
-        service: service,
-    }
+	return &TaskService{
+		service: service,
+	}
 }
 type TaskCollaboratorService struct {
-    service     *Service
+	service     *Service
 }
 
 func newTaskCollaboratorService(service *Service) *TaskCollaboratorService {
-    return &TaskCollaboratorService{
-        service: service,
-    }
+	return &TaskCollaboratorService{
+		service: service,
+	}
 }
 type TaskCommentService struct {
-    service     *Service
+	service     *Service
 }
 
 func newTaskCommentService(service *Service) *TaskCommentService {
-    return &TaskCommentService{
-        service: service,
-    }
+	return &TaskCommentService{
+		service: service,
+	}
 }
 type TaskFollowerService struct {
-    service     *Service
+	service     *Service
 }
 
 func newTaskFollowerService(service *Service) *TaskFollowerService {
-    return &TaskFollowerService{
-        service: service,
-    }
+	return &TaskFollowerService{
+		service: service,
+	}
 }
 type TaskReminderService struct {
-    service     *Service
+	service     *Service
 }
 
 func newTaskReminderService(service *Service) *TaskReminderService {
-    return &TaskReminderService{
-        service: service,
-    }
+	return &TaskReminderService{
+		service: service,
+	}
 }
 
 
@@ -91,7 +91,7 @@ func (rc *TaskCompleteReqCall) SetTaskId(taskId string){
 
 func (rc *TaskCompleteReqCall) Do() (*response.NoData, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &response.NoData{}
+	var result = &response.NoData{}
 	req := request.NewRequest("task/v1/tasks/:task_id/complete", "POST",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
@@ -102,137 +102,7 @@ func (tasks *TaskService) Complete(ctx *core.Context,  optFns ...request.OptFn) 
 	return &TaskCompleteReqCall{
 		ctx:    ctx,
 		tasks: tasks,
-        pathParams:        map[string]interface{}{},
-		optFns:      optFns,
-	}
-}
-
-
-type TaskCollaboratorCreateReqCall struct {
-	ctx    *core.Context
-	taskCollaborators *TaskCollaboratorService
-	body *Collaborator
-	pathParams  map[string]interface{}
-	queryParams map[string]interface{}
-	optFns   []request.OptFn
-}
-func (rc *TaskCollaboratorCreateReqCall) SetTaskId(taskId string){
-	rc.pathParams["task_id"] = taskId
-}
-func (rc *TaskCollaboratorCreateReqCall) SetUserIdType(userIdType string){
-	rc.queryParams["user_id_type"] = userIdType
-}
-
-func (rc *TaskCollaboratorCreateReqCall) Do() (*TaskCollaboratorCreateResult, error) {
-	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskCollaboratorCreateResult{}
-	req := request.NewRequest("task/v1/tasks/:task_id/collaborators", "POST",
-		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.taskCollaborators.service.conf, req)
-	return result, err
-}
-
-func (taskCollaborators *TaskCollaboratorService) Create(ctx *core.Context, body  *Collaborator, optFns ...request.OptFn) *TaskCollaboratorCreateReqCall {
-	return &TaskCollaboratorCreateReqCall{
-		ctx:    ctx,
-		taskCollaborators: taskCollaborators,
-		body:        body,
-        pathParams:        map[string]interface{}{},
-        queryParams:        map[string]interface{}{},
-		optFns:      optFns,
-	}
-}
-
-
-type TaskCreateReqCall struct {
-	ctx    *core.Context
-	tasks *TaskService
-	body *Task
-	queryParams map[string]interface{}
-	optFns   []request.OptFn
-}
-func (rc *TaskCreateReqCall) SetUserIdType(userIdType string){
-	rc.queryParams["user_id_type"] = userIdType
-}
-
-func (rc *TaskCreateReqCall) Do() (*TaskCreateResult, error) {
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskCreateResult{}
-	req := request.NewRequest("task/v1/tasks", "POST",
-		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
-	return result, err
-}
-
-func (tasks *TaskService) Create(ctx *core.Context, body  *Task, optFns ...request.OptFn) *TaskCreateReqCall {
-	return &TaskCreateReqCall{
-		ctx:    ctx,
-		tasks: tasks,
-		body:        body,
-        queryParams:        map[string]interface{}{},
-		optFns:      optFns,
-	}
-}
-
-
-type TaskCommentCreateReqCall struct {
-	ctx    *core.Context
-	taskComments *TaskCommentService
-	body *Comment
-	pathParams  map[string]interface{}
-	optFns   []request.OptFn
-}
-func (rc *TaskCommentCreateReqCall) SetTaskId(taskId string){
-	rc.pathParams["task_id"] = taskId
-}
-
-func (rc *TaskCommentCreateReqCall) Do() (*TaskCommentCreateResult, error) {
-	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &TaskCommentCreateResult{}
-	req := request.NewRequest("task/v1/tasks/:task_id/comments", "POST",
-		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.taskComments.service.conf, req)
-	return result, err
-}
-
-func (taskComments *TaskCommentService) Create(ctx *core.Context, body  *Comment, optFns ...request.OptFn) *TaskCommentCreateReqCall {
-	return &TaskCommentCreateReqCall{
-		ctx:    ctx,
-		taskComments: taskComments,
-		body:        body,
-        pathParams:        map[string]interface{}{},
-		optFns:      optFns,
-	}
-}
-
-
-type TaskReminderCreateReqCall struct {
-	ctx    *core.Context
-	taskReminders *TaskReminderService
-	body *Reminder
-	pathParams  map[string]interface{}
-	optFns   []request.OptFn
-}
-func (rc *TaskReminderCreateReqCall) SetTaskId(taskId string){
-	rc.pathParams["task_id"] = taskId
-}
-
-func (rc *TaskReminderCreateReqCall) Do() (*TaskReminderCreateResult, error) {
-	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &TaskReminderCreateResult{}
-	req := request.NewRequest("task/v1/tasks/:task_id/reminders", "POST",
-		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.taskReminders.service.conf, req)
-	return result, err
-}
-
-func (taskReminders *TaskReminderService) Create(ctx *core.Context, body  *Reminder, optFns ...request.OptFn) *TaskReminderCreateReqCall {
-	return &TaskReminderCreateReqCall{
-		ctx:    ctx,
-		taskReminders: taskReminders,
-		body:        body,
-        pathParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -255,8 +125,8 @@ func (rc *TaskFollowerCreateReqCall) SetUserIdType(userIdType string){
 
 func (rc *TaskFollowerCreateReqCall) Do() (*TaskFollowerCreateResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskFollowerCreateResult{}
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskFollowerCreateResult{}
 	req := request.NewRequest("task/v1/tasks/:task_id/followers", "POST",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.taskFollowers.service.conf, req)
@@ -268,40 +138,138 @@ func (taskFollowers *TaskFollowerService) Create(ctx *core.Context, body  *Follo
 		ctx:    ctx,
 		taskFollowers: taskFollowers,
 		body:        body,
-        pathParams:        map[string]interface{}{},
-        queryParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
+		queryParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
 
 
-type TaskFollowerDeleteReqCall struct {
+type TaskCollaboratorCreateReqCall struct {
 	ctx    *core.Context
-	taskFollowers *TaskFollowerService
+	taskCollaborators *TaskCollaboratorService
+	body *Collaborator
 	pathParams  map[string]interface{}
+	queryParams map[string]interface{}
 	optFns   []request.OptFn
 }
-func (rc *TaskFollowerDeleteReqCall) SetTaskId(taskId string){
+func (rc *TaskCollaboratorCreateReqCall) SetTaskId(taskId string){
 	rc.pathParams["task_id"] = taskId
 }
-func (rc *TaskFollowerDeleteReqCall) SetFollowerId(followerId string){
-	rc.pathParams["follower_id"] = followerId
+func (rc *TaskCollaboratorCreateReqCall) SetUserIdType(userIdType string){
+	rc.queryParams["user_id_type"] = userIdType
 }
 
-func (rc *TaskFollowerDeleteReqCall) Do() (*response.NoData, error) {
+func (rc *TaskCollaboratorCreateReqCall) Do() (*TaskCollaboratorCreateResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &response.NoData{}
-	req := request.NewRequest("task/v1/tasks/:task_id/followers/:follower_id", "DELETE",
-		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.taskFollowers.service.conf, req)
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskCollaboratorCreateResult{}
+	req := request.NewRequest("task/v1/tasks/:task_id/collaborators", "POST",
+		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
+	err := api.Send(rc.ctx, rc.taskCollaborators.service.conf, req)
 	return result, err
 }
 
-func (taskFollowers *TaskFollowerService) Delete(ctx *core.Context,  optFns ...request.OptFn) *TaskFollowerDeleteReqCall {
-	return &TaskFollowerDeleteReqCall{
+func (taskCollaborators *TaskCollaboratorService) Create(ctx *core.Context, body  *Collaborator, optFns ...request.OptFn) *TaskCollaboratorCreateReqCall {
+	return &TaskCollaboratorCreateReqCall{
 		ctx:    ctx,
-		taskFollowers: taskFollowers,
-        pathParams:        map[string]interface{}{},
+		taskCollaborators: taskCollaborators,
+		body:        body,
+		pathParams:        map[string]interface{}{},
+		queryParams:        map[string]interface{}{},
+		optFns:      optFns,
+	}
+}
+
+
+type TaskReminderCreateReqCall struct {
+	ctx    *core.Context
+	taskReminders *TaskReminderService
+	body *Reminder
+	pathParams  map[string]interface{}
+	optFns   []request.OptFn
+}
+func (rc *TaskReminderCreateReqCall) SetTaskId(taskId string){
+	rc.pathParams["task_id"] = taskId
+}
+
+func (rc *TaskReminderCreateReqCall) Do() (*TaskReminderCreateResult, error) {
+	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
+	var result = &TaskReminderCreateResult{}
+	req := request.NewRequest("task/v1/tasks/:task_id/reminders", "POST",
+		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
+	err := api.Send(rc.ctx, rc.taskReminders.service.conf, req)
+	return result, err
+}
+
+func (taskReminders *TaskReminderService) Create(ctx *core.Context, body  *Reminder, optFns ...request.OptFn) *TaskReminderCreateReqCall {
+	return &TaskReminderCreateReqCall{
+		ctx:    ctx,
+		taskReminders: taskReminders,
+		body:        body,
+		pathParams:        map[string]interface{}{},
+		optFns:      optFns,
+	}
+}
+
+
+type TaskCreateReqCall struct {
+	ctx    *core.Context
+	tasks *TaskService
+	body *Task
+	queryParams map[string]interface{}
+	optFns   []request.OptFn
+}
+func (rc *TaskCreateReqCall) SetUserIdType(userIdType string){
+	rc.queryParams["user_id_type"] = userIdType
+}
+
+func (rc *TaskCreateReqCall) Do() (*TaskCreateResult, error) {
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskCreateResult{}
+	req := request.NewRequest("task/v1/tasks", "POST",
+		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
+	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
+	return result, err
+}
+
+func (tasks *TaskService) Create(ctx *core.Context, body  *Task, optFns ...request.OptFn) *TaskCreateReqCall {
+	return &TaskCreateReqCall{
+		ctx:    ctx,
+		tasks: tasks,
+		body:        body,
+		queryParams:        map[string]interface{}{},
+		optFns:      optFns,
+	}
+}
+
+
+type TaskCommentCreateReqCall struct {
+	ctx    *core.Context
+	taskComments *TaskCommentService
+	body *Comment
+	pathParams  map[string]interface{}
+	optFns   []request.OptFn
+}
+func (rc *TaskCommentCreateReqCall) SetTaskId(taskId string){
+	rc.pathParams["task_id"] = taskId
+}
+
+func (rc *TaskCommentCreateReqCall) Do() (*TaskCommentCreateResult, error) {
+	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
+	var result = &TaskCommentCreateResult{}
+	req := request.NewRequest("task/v1/tasks/:task_id/comments", "POST",
+		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
+	err := api.Send(rc.ctx, rc.taskComments.service.conf, req)
+	return result, err
+}
+
+func (taskComments *TaskCommentService) Create(ctx *core.Context, body  *Comment, optFns ...request.OptFn) *TaskCommentCreateReqCall {
+	return &TaskCommentCreateReqCall{
+		ctx:    ctx,
+		taskComments: taskComments,
+		body:        body,
+		pathParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -322,7 +290,7 @@ func (rc *TaskReminderDeleteReqCall) SetReminderId(reminderId string){
 
 func (rc *TaskReminderDeleteReqCall) Do() (*response.NoData, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &response.NoData{}
+	var result = &response.NoData{}
 	req := request.NewRequest("task/v1/tasks/:task_id/reminders/:reminder_id", "DELETE",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.taskReminders.service.conf, req)
@@ -333,68 +301,7 @@ func (taskReminders *TaskReminderService) Delete(ctx *core.Context,  optFns ...r
 	return &TaskReminderDeleteReqCall{
 		ctx:    ctx,
 		taskReminders: taskReminders,
-        pathParams:        map[string]interface{}{},
-		optFns:      optFns,
-	}
-}
-
-
-type TaskCommentDeleteReqCall struct {
-	ctx    *core.Context
-	taskComments *TaskCommentService
-	pathParams  map[string]interface{}
-	optFns   []request.OptFn
-}
-func (rc *TaskCommentDeleteReqCall) SetTaskId(taskId string){
-	rc.pathParams["task_id"] = taskId
-}
-func (rc *TaskCommentDeleteReqCall) SetCommentId(commentId int64){
-	rc.pathParams["comment_id"] = commentId
-}
-
-func (rc *TaskCommentDeleteReqCall) Do() (*response.NoData, error) {
-	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &response.NoData{}
-	req := request.NewRequest("task/v1/tasks/:task_id/comments/:comment_id", "DELETE",
-		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.taskComments.service.conf, req)
-	return result, err
-}
-
-func (taskComments *TaskCommentService) Delete(ctx *core.Context,  optFns ...request.OptFn) *TaskCommentDeleteReqCall {
-	return &TaskCommentDeleteReqCall{
-		ctx:    ctx,
-		taskComments: taskComments,
-        pathParams:        map[string]interface{}{},
-		optFns:      optFns,
-	}
-}
-
-
-type TaskDeleteReqCall struct {
-	ctx    *core.Context
-	tasks *TaskService
-	pathParams  map[string]interface{}
-	optFns   []request.OptFn
-}
-func (rc *TaskDeleteReqCall) SetTaskId(taskId string){
-	rc.pathParams["task_id"] = taskId
-}
-
-func (rc *TaskDeleteReqCall) Do() (*response.NoData, error) {
-	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &response.NoData{}
-	req := request.NewRequest("task/v1/tasks/:task_id", "DELETE",
-		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
-	return result, err
-}
-
-func (tasks *TaskService) Delete(ctx *core.Context,  optFns ...request.OptFn) *TaskDeleteReqCall {
-	return &TaskDeleteReqCall{
-		ctx:    ctx,
-		tasks: tasks,
-        pathParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -415,7 +322,7 @@ func (rc *TaskCollaboratorDeleteReqCall) SetCollaboratorId(collaboratorId string
 
 func (rc *TaskCollaboratorDeleteReqCall) Do() (*response.NoData, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &response.NoData{}
+	var result = &response.NoData{}
 	req := request.NewRequest("task/v1/tasks/:task_id/collaborators/:collaborator_id", "DELETE",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.taskCollaborators.service.conf, req)
@@ -426,7 +333,100 @@ func (taskCollaborators *TaskCollaboratorService) Delete(ctx *core.Context,  opt
 	return &TaskCollaboratorDeleteReqCall{
 		ctx:    ctx,
 		taskCollaborators: taskCollaborators,
-        pathParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
+		optFns:      optFns,
+	}
+}
+
+
+type TaskFollowerDeleteReqCall struct {
+	ctx    *core.Context
+	taskFollowers *TaskFollowerService
+	pathParams  map[string]interface{}
+	optFns   []request.OptFn
+}
+func (rc *TaskFollowerDeleteReqCall) SetTaskId(taskId string){
+	rc.pathParams["task_id"] = taskId
+}
+func (rc *TaskFollowerDeleteReqCall) SetFollowerId(followerId string){
+	rc.pathParams["follower_id"] = followerId
+}
+
+func (rc *TaskFollowerDeleteReqCall) Do() (*response.NoData, error) {
+	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
+	var result = &response.NoData{}
+	req := request.NewRequest("task/v1/tasks/:task_id/followers/:follower_id", "DELETE",
+		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
+	err := api.Send(rc.ctx, rc.taskFollowers.service.conf, req)
+	return result, err
+}
+
+func (taskFollowers *TaskFollowerService) Delete(ctx *core.Context,  optFns ...request.OptFn) *TaskFollowerDeleteReqCall {
+	return &TaskFollowerDeleteReqCall{
+		ctx:    ctx,
+		taskFollowers: taskFollowers,
+		pathParams:        map[string]interface{}{},
+		optFns:      optFns,
+	}
+}
+
+
+type TaskDeleteReqCall struct {
+	ctx    *core.Context
+	tasks *TaskService
+	pathParams  map[string]interface{}
+	optFns   []request.OptFn
+}
+func (rc *TaskDeleteReqCall) SetTaskId(taskId string){
+	rc.pathParams["task_id"] = taskId
+}
+
+func (rc *TaskDeleteReqCall) Do() (*response.NoData, error) {
+	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
+	var result = &response.NoData{}
+	req := request.NewRequest("task/v1/tasks/:task_id", "DELETE",
+		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
+	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
+	return result, err
+}
+
+func (tasks *TaskService) Delete(ctx *core.Context,  optFns ...request.OptFn) *TaskDeleteReqCall {
+	return &TaskDeleteReqCall{
+		ctx:    ctx,
+		tasks: tasks,
+		pathParams:        map[string]interface{}{},
+		optFns:      optFns,
+	}
+}
+
+
+type TaskCommentDeleteReqCall struct {
+	ctx    *core.Context
+	taskComments *TaskCommentService
+	pathParams  map[string]interface{}
+	optFns   []request.OptFn
+}
+func (rc *TaskCommentDeleteReqCall) SetTaskId(taskId string){
+	rc.pathParams["task_id"] = taskId
+}
+func (rc *TaskCommentDeleteReqCall) SetCommentId(commentId int64){
+	rc.pathParams["comment_id"] = commentId
+}
+
+func (rc *TaskCommentDeleteReqCall) Do() (*response.NoData, error) {
+	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
+	var result = &response.NoData{}
+	req := request.NewRequest("task/v1/tasks/:task_id/comments/:comment_id", "DELETE",
+		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
+	err := api.Send(rc.ctx, rc.taskComments.service.conf, req)
+	return result, err
+}
+
+func (taskComments *TaskCommentService) Delete(ctx *core.Context,  optFns ...request.OptFn) *TaskCommentDeleteReqCall {
+	return &TaskCommentDeleteReqCall{
+		ctx:    ctx,
+		taskComments: taskComments,
+		pathParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -447,7 +447,7 @@ func (rc *TaskCommentGetReqCall) SetCommentId(commentId int64){
 
 func (rc *TaskCommentGetReqCall) Do() (*TaskCommentGetResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &TaskCommentGetResult{}
+	var result = &TaskCommentGetResult{}
 	req := request.NewRequest("task/v1/tasks/:task_id/comments/:comment_id", "GET",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.taskComments.service.conf, req)
@@ -458,7 +458,7 @@ func (taskComments *TaskCommentService) Get(ctx *core.Context,  optFns ...reques
 	return &TaskCommentGetReqCall{
 		ctx:    ctx,
 		taskComments: taskComments,
-        pathParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -480,8 +480,8 @@ func (rc *TaskGetReqCall) SetUserIdType(userIdType string){
 
 func (rc *TaskGetReqCall) Do() (*TaskGetResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskGetResult{}
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskGetResult{}
 	req := request.NewRequest("task/v1/tasks/:task_id", "GET",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
@@ -492,49 +492,46 @@ func (tasks *TaskService) Get(ctx *core.Context,  optFns ...request.OptFn) *Task
 	return &TaskGetReqCall{
 		ctx:    ctx,
 		tasks: tasks,
-        pathParams:        map[string]interface{}{},
-        queryParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
+		queryParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
 
 
-type TaskCollaboratorListReqCall struct {
+type TaskReminderListReqCall struct {
 	ctx    *core.Context
-	taskCollaborators *TaskCollaboratorService
+	taskReminders *TaskReminderService
 	pathParams  map[string]interface{}
 	queryParams map[string]interface{}
 	optFns   []request.OptFn
 }
-func (rc *TaskCollaboratorListReqCall) SetTaskId(taskId string){
+func (rc *TaskReminderListReqCall) SetTaskId(taskId string){
 	rc.pathParams["task_id"] = taskId
 }
-func (rc *TaskCollaboratorListReqCall) SetPageSize(pageSize int){
+func (rc *TaskReminderListReqCall) SetPageSize(pageSize int){
 	rc.queryParams["page_size"] = pageSize
 }
-func (rc *TaskCollaboratorListReqCall) SetPageToken(pageToken string){
+func (rc *TaskReminderListReqCall) SetPageToken(pageToken string){
 	rc.queryParams["page_token"] = pageToken
 }
-func (rc *TaskCollaboratorListReqCall) SetUserIdType(userIdType string){
-	rc.queryParams["user_id_type"] = userIdType
-}
 
-func (rc *TaskCollaboratorListReqCall) Do() (*TaskCollaboratorListResult, error) {
+func (rc *TaskReminderListReqCall) Do() (*TaskReminderListResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskCollaboratorListResult{}
-	req := request.NewRequest("task/v1/tasks/:task_id/collaborators", "GET",
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskReminderListResult{}
+	req := request.NewRequest("task/v1/tasks/:task_id/reminders", "GET",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.taskCollaborators.service.conf, req)
+	err := api.Send(rc.ctx, rc.taskReminders.service.conf, req)
 	return result, err
 }
 
-func (taskCollaborators *TaskCollaboratorService) List(ctx *core.Context,  optFns ...request.OptFn) *TaskCollaboratorListReqCall {
-	return &TaskCollaboratorListReqCall{
+func (taskReminders *TaskReminderService) List(ctx *core.Context,  optFns ...request.OptFn) *TaskReminderListReqCall {
+	return &TaskReminderListReqCall{
 		ctx:    ctx,
-		taskCollaborators: taskCollaborators,
-        pathParams:        map[string]interface{}{},
-        queryParams:        map[string]interface{}{},
+		taskReminders: taskReminders,
+		pathParams:        map[string]interface{}{},
+		queryParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -562,8 +559,8 @@ func (rc *TaskFollowerListReqCall) SetUserIdType(userIdType string){
 
 func (rc *TaskFollowerListReqCall) Do() (*TaskFollowerListResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskFollowerListResult{}
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskFollowerListResult{}
 	req := request.NewRequest("task/v1/tasks/:task_id/followers", "GET",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.taskFollowers.service.conf, req)
@@ -574,46 +571,49 @@ func (taskFollowers *TaskFollowerService) List(ctx *core.Context,  optFns ...req
 	return &TaskFollowerListReqCall{
 		ctx:    ctx,
 		taskFollowers: taskFollowers,
-        pathParams:        map[string]interface{}{},
-        queryParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
+		queryParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
 
 
-type TaskReminderListReqCall struct {
+type TaskCollaboratorListReqCall struct {
 	ctx    *core.Context
-	taskReminders *TaskReminderService
+	taskCollaborators *TaskCollaboratorService
 	pathParams  map[string]interface{}
 	queryParams map[string]interface{}
 	optFns   []request.OptFn
 }
-func (rc *TaskReminderListReqCall) SetTaskId(taskId string){
+func (rc *TaskCollaboratorListReqCall) SetTaskId(taskId string){
 	rc.pathParams["task_id"] = taskId
 }
-func (rc *TaskReminderListReqCall) SetPageSize(pageSize int){
+func (rc *TaskCollaboratorListReqCall) SetPageSize(pageSize int){
 	rc.queryParams["page_size"] = pageSize
 }
-func (rc *TaskReminderListReqCall) SetPageToken(pageToken string){
+func (rc *TaskCollaboratorListReqCall) SetPageToken(pageToken string){
 	rc.queryParams["page_token"] = pageToken
 }
+func (rc *TaskCollaboratorListReqCall) SetUserIdType(userIdType string){
+	rc.queryParams["user_id_type"] = userIdType
+}
 
-func (rc *TaskReminderListReqCall) Do() (*TaskReminderListResult, error) {
+func (rc *TaskCollaboratorListReqCall) Do() (*TaskCollaboratorListResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskReminderListResult{}
-	req := request.NewRequest("task/v1/tasks/:task_id/reminders", "GET",
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskCollaboratorListResult{}
+	req := request.NewRequest("task/v1/tasks/:task_id/collaborators", "GET",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
-	err := api.Send(rc.ctx, rc.taskReminders.service.conf, req)
+	err := api.Send(rc.ctx, rc.taskCollaborators.service.conf, req)
 	return result, err
 }
 
-func (taskReminders *TaskReminderService) List(ctx *core.Context,  optFns ...request.OptFn) *TaskReminderListReqCall {
-	return &TaskReminderListReqCall{
+func (taskCollaborators *TaskCollaboratorService) List(ctx *core.Context,  optFns ...request.OptFn) *TaskCollaboratorListReqCall {
+	return &TaskCollaboratorListReqCall{
 		ctx:    ctx,
-		taskReminders: taskReminders,
-        pathParams:        map[string]interface{}{},
-        queryParams:        map[string]interface{}{},
+		taskCollaborators: taskCollaborators,
+		pathParams:        map[string]interface{}{},
+		queryParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -636,8 +636,8 @@ func (rc *TaskPatchReqCall) SetUserIdType(userIdType string){
 
 func (rc *TaskPatchReqCall) Do() (*TaskPatchResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
-    var result = &TaskPatchResult{}
+	rc.optFns = append(rc.optFns, request.SetQueryParams(rc.queryParams))
+	var result = &TaskPatchResult{}
 	req := request.NewRequest("task/v1/tasks/:task_id", "PATCH",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
@@ -649,8 +649,8 @@ func (tasks *TaskService) Patch(ctx *core.Context, body  *TaskPatchReqBody, optF
 		ctx:    ctx,
 		tasks: tasks,
 		body:        body,
-        pathParams:        map[string]interface{}{},
-        queryParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
+		queryParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -668,7 +668,7 @@ func (rc *TaskUncompleteReqCall) SetTaskId(taskId string){
 
 func (rc *TaskUncompleteReqCall) Do() (*response.NoData, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &response.NoData{}
+	var result = &response.NoData{}
 	req := request.NewRequest("task/v1/tasks/:task_id/uncomplete", "POST",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, nil, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.tasks.service.conf, req)
@@ -679,7 +679,7 @@ func (tasks *TaskService) Uncomplete(ctx *core.Context,  optFns ...request.OptFn
 	return &TaskUncompleteReqCall{
 		ctx:    ctx,
 		tasks: tasks,
-        pathParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }
@@ -701,7 +701,7 @@ func (rc *TaskCommentUpdateReqCall) SetCommentId(commentId int64){
 
 func (rc *TaskCommentUpdateReqCall) Do() (*TaskCommentUpdateResult, error) {
 	rc.optFns = append(rc.optFns, request.SetPathParams(rc.pathParams))
-    var result = &TaskCommentUpdateResult{}
+	var result = &TaskCommentUpdateResult{}
 	req := request.NewRequest("task/v1/tasks/:task_id/comments/:comment_id", "PUT",
 		[]request.AccessTokenType{request.AccessTokenTypeTenant}, rc.body, result, rc.optFns...)
 	err := api.Send(rc.ctx, rc.taskComments.service.conf, req)
@@ -713,7 +713,7 @@ func (taskComments *TaskCommentService) Update(ctx *core.Context, body  *TaskCom
 		ctx:    ctx,
 		taskComments: taskComments,
 		body:        body,
-        pathParams:        map[string]interface{}{},
+		pathParams:        map[string]interface{}{},
 		optFns:      optFns,
 	}
 }

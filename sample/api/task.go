@@ -11,7 +11,7 @@ import (
 	task "github.com/larksuite/oapi-sdk-go/service/task/v1"
 )
 
-var taskService = task.NewService(configs.TestConfig("https://open.feishu.cn"))
+var taskService = task.NewService(configs.TestConfig("https://open.feishu-boe.cn"))
 
 func main() {
 	testCreateTask()
@@ -24,6 +24,7 @@ func testCreateTask() {
 		Summary: "测试新建任务",
 		Due:     &task.Due{Time: 10000000, Timezone: "Asia/Shanghai", IsAllDay: false},
 		Origin:  &task.Origin{PlatformI18nName: "{\"zh_cn\": \"IT 工作台\", \"en_us\": \"IT Workspace\"}", Href: &task.Href{Url: "https://www.feishu-boe.cn", Title: "test issue"}},
+		CanEdit: true,
 	})
 	createTaskMessage, createTaskErr := createTaskReqCall.Do()
 	fmt.Println(coreCtx.GetRequestID())
